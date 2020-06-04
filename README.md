@@ -34,6 +34,14 @@ steps:
   - status: 1m
 ```
 
+The script above is named "CORD-19 Pipeline" and has a series of sequential steps. Kernel steps will execute a kernel and status steps will poll the status of preceding kernel steps, waiting for completion. For example, the first status command above will run a Status API call every minute checking for completion. If any of the steps return an error status, the pipeline is halted and the program exits. 
+
+Assuming the YAML file above is stored at pipeline.yml, the pipeline can be executed via:
+
+```bash
+kernelpipes pipeline.yml
+```
+
 ### Supported Steps
 
 #### kernel
