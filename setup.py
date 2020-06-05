@@ -19,7 +19,7 @@ setup(name="kernelpipes",
       license="MIT License: http://opensource.org/licenses/MIT",
       packages=find_packages(where="src/python/"),
       package_dir={"": "src/python/"},
-      keywords="python machine-learning kaggle",
+      keywords="python kaggle job task machine-learning",
       python_requires=">=3.6",
       entry_points={
           "console_scripts": [
@@ -27,6 +27,7 @@ setup(name="kernelpipes",
           ],
       },
       install_requires=[
+          "croniter>=0.3.32",
           "kaggle>=1.5.6",
           "PyYAML>=5.3"
       ],

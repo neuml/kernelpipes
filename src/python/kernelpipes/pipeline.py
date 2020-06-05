@@ -2,12 +2,20 @@
 Pipeline module
 """
 
+import logging
 import os
 import sys
 import time
 
-import kaggle
+from datetime import datetime
+
 import yaml
+
+from croniter import croniter
+
+from .steps.check import Check
+from .steps.kernel import Kernel
+from .steps.status import Status
 
 class Pipeline(object):
     """
@@ -15,120 +23,89 @@ class Pipeline(object):
     """
 
     @staticmethod
-    def wait(duration):
+    def execute(directory, pipeline):
         """
-        Sleeps for the duration passed in. Supports suffixed strings (minutes, seconds, hours)
-        """
-
-        # Convert string to number of seconds as a float
-        if isinstance(duration, str):
-            if duration.endswith("s"):
-                duration = float(duration.rstrip("s").strip())
-            elif duration.endswith("m"):
-                duration = float(duration.rstrip("m").strip()) * 60
-            elif duration.endswith("h"):
-                duration = float(duration.rstrip("h").strip()) * 60 * 60
-            else:
-                duration = float(duration)
-
-        # Wait duration seconds
-        time.sleep(max(duration, 1))
-
-    @staticmethod
-    def status(kernels, wait):
-        """
-        Waits for completion of the input kernels.
+        Executes a single pipeline run.
 
         Args:
-            kernels: list of kernels to check status for
-            wait: wait duration between status checks
-
-        Returns:
-            list of (kernel, status, message)
+            directory: pipeline configuration directory
+            pipeline: pipeline configuration
         """
 
-        results = []
+        # List of kernels currently running
+        kernels = []
 
-        while kernels:
-            for kernel in kernels:
-                # Check status of the job
-                result = kaggle.api.kernels_status(kernel)
-                status, message = result["status"], result["failureMessage"]
+        logging.info("Executing pipeline: %s", pipeline["name"])
+        for step in pipeline["steps"]:
+            if "check" in step:
+                if not Check(directory, step["check"])():
+                    break
 
-                # Save status if completed
-                if status not in ("running", "queued"):
-                    results.append((kernel, status, message))
+            elif "kernel" in step:
+                Kernel(directory, step["kernel"])()
+                kernels.append(step["kernel"])
 
-            # Remove completed jobs
-            for kernel, _, _ in results:
-                if kernel in kernels:
-                    kernels.remove(kernel)
+            elif "status" in step:
+                # Break out of processing loop if errors found
+                if not Status(kernels, step["status"])():
+                    return
 
-            # Wait for the specified duration
-            print("Waiting for %s" % wait)
-            Pipeline.wait(wait)
+                # Reset kernels
+                kernels = []
 
-        return results
+        logging.info("Pipeline complete")
 
     @staticmethod
-    def kernel(directory, kernel):
+    def schedule(directory, pipeline):
         """
-        Executes a Kaggle Kernel.
+        Runs a pipeline job through a job scheduler.
 
         Args:
-            directory: pipeline working directory
-            kernel: kernel name
+            directory: pipeline configuration directory
+            pipeline: pipeline configuration
         """
 
-        path = os.path.join(directory, kernel)
+        logging.info("Pipeline scheduler enabled for %s using schedule %s", pipeline["name"], pipeline["schedule"])
 
-        # Pull down latest version of kernel
-        kaggle.api.kernels_pull(kernel, path, True, False)
+        while True:
+            # Schedule using localtime
+            schedule = croniter(pipeline["schedule"], datetime.now().astimezone()).get_next(datetime)
+            logging.info("Next run scheduled for %s", schedule.isoformat())
+            time.sleep(schedule.timestamp() - time.time())
 
-        # Push and run the kernel
-        kaggle.api.kernels_push(path)
+            Pipeline.execute(directory, pipeline)
 
     @staticmethod
     def run(task):
         """
-        Executes a kernel pipeline.
+        Executes a kernel pipeline loop.
 
         Args:
             task: path to pipeline task YAML file
         """
+
+        # Initialize logging
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(module)-10s: %(message)s")
 
         # Load pipeline YAML file
         with open(task, "r") as f:
             # Read configuration
             pipeline = yaml.safe_load(f)
 
-        # Initialize variables
-        directory, kernels, errors = os.path.dirname(task), [], False
+        if "name" not in pipeline or "steps" not in pipeline:
+            logging.error("Pipeline name and steps fields are required")
+            return
 
-        print("Executing pipeline:", pipeline["name"])
-        for step in pipeline["steps"]:
-            if "kernel" in step:
-                print("Running Kernel: ", step["kernel"])
-                Pipeline.kernel(directory, step["kernel"])
-                kernels.append(step["kernel"])
+        # Get base directory where pipeline configuration stored
+        directory = os.path.dirname(task)
 
-            elif "status" in step:
-                # Waiting for completion of all running jobs
-                for kernel, status, message in Pipeline.status(kernels, step["status"]):
-                    # Check for errors and return if found
-                    if status != "complete" or message:
-                        print("ERROR:", kernel, status, message)
-                    else:
-                        print("Kernel Complete:", kernel)
-
-                # If any errors found, break out of processing loop
-                if errors:
-                    return
-
-                # Reset kernels
-                kernels = []
-
-        print("Pipeline complete")
+        # Check if pipeline should be schedule or run a single time
+        if "schedule" in pipeline:
+            # Job scheduler
+            Pipeline.schedule(directory, pipeline)
+        else:
+            # Single run
+            Pipeline.execute(directory, pipeline)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
