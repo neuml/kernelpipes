@@ -23,7 +23,7 @@ setup(name="kernelpipes",
       python_requires=">=3.6",
       entry_points={
           "console_scripts": [
-              "kernelpipes = kernelpipes.execute:main",
+              "kernelpipes = kernelpipes.pipeline:main",
           ],
       },
       install_requires=[
