@@ -107,8 +107,15 @@ class Pipeline(object):
             # Single run
             Pipeline.execute(directory, pipeline)
 
-if __name__ == "__main__":
+def main():
+    """
+    Main execution loop.
+    """
+
     if len(sys.argv) > 1:
         Pipeline.run(sys.argv[1])
     else:
         print("Usage: pipeline <path to pipeline.yml file>")
+
+if __name__ == "__main__":
+    main()
