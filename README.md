@@ -2,11 +2,9 @@
 kernelpipes is a Python 3.x project that supports running a series of Kaggle kernels through the Kaggle API. 
 
 ### Installation
-You can use Git to clone the repository from GitHub and install it. It is recommended to do this in a Python Virtual Environment. 
+You can install kernelpipes directly from GitHub using pip. Using a Python Virtual Environment is recommended.
 
-    git clone https://github.com/neuml/kernelpipes.git
-    cd kernelpipes
-    pip install .
+    pip install git+https://github.com/neuml/kernelpipes
 
 Python 3.6+ is supported
 
