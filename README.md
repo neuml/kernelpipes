@@ -77,7 +77,7 @@ kernel: /kaggle/kernel/path
 ```
 Returns the kernel specified at /kaggle/kernel/path
 
-### status
+#### status
 ```yaml
 status: <seconds|s|m|h>
 ```
