@@ -45,6 +45,7 @@ Assuming the YAML file above is stored at pipeline.yml, the pipeline can be exec
 ```bash
 kernelpipes pipeline.yml
 ```
+*Note: When running on Windows, it may be necessary to set an environment variable to force UTF-8 file operations before running the command above e.g. 'set PYTHONUTF8=1'*
 
 ### Basic pipeline configuration
 
