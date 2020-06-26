@@ -15,6 +15,7 @@ from croniter import croniter
 
 from .steps.check import Check
 from .steps.kernel import Kernel
+from .steps.output import Output
 from .steps.status import Status
 
 class Pipeline(object):
@@ -44,6 +45,9 @@ class Pipeline(object):
             elif "kernel" in step:
                 Kernel(directory, step["kernel"])()
                 kernels.append(step["kernel"])
+
+            elif "output" in step:
+                Output(directory, step["output"])()
 
             elif "status" in step:
                 # Break out of processing loop if errors found

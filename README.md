@@ -2,7 +2,7 @@
 kernelpipes is a Python 3.x project that supports running a series of Kaggle kernels through the Kaggle API. 
 
 ### Installation
-You can install kernelpipes directly from GitHub using pip. Using a Python Virtual Environment is recommended.
+kernelpipes can be directly installed from GitHub using pip. A Python Virtual Environment is recommended.
 
     pip install git+https://github.com/neuml/kernelpipes
 
@@ -12,6 +12,21 @@ This package assumes a Kaggle token has been generated and installed. See the [k
 
 ### Example
 The following YAML script is an example pipeline script. Pipelines require a name and a series of steps to execute. 
+
+```yaml
+# Pipeline name
+name: CORD-19 Papers
+
+# Pipeline execution steps
+steps:
+  - kernel: davidmezzetti/cord-19-papers
+  - status: 2.5m
+  - output: davidmezzetti/cord-19-papers
+```
+
+The above pipeline executes a kernel named cord-19-papers, checking every 2.5 minutes for completion. Once the kernel is complete, output files are downloaded locally.
+
+Below is a more complex example demonstrating scheduling and multiple status steps.
 
 ```yaml
 # Pipeline name
@@ -27,13 +42,13 @@ steps:
   - status: 1m
   - kernel: davidmezzetti/cord-19-analysis-with-sentence-embeddings
   - status: 15m
+  - kernel: davidmezzetti/cord-19-patient-descriptions
   - kernel: davidmezzetti/cord-19-risk-factors
-  - kernel: davidmezzetti/cord-19-key-scientific-questions
-  - status: 1m
+  - status: 2.5m
   - kernel: davidmezzetti/cord-19-report-builder
   - kernel: davidmezzetti/cord-19-study-metadata-export
   - kernel: davidmezzetti/cord-19-task-csv-exports
-  - status: 1m
+  - status: 2.5m
 ```
 
 The script above is named "CORD-19 Pipeline" and has a series of sequential steps. Kernel steps will execute a kernel and status steps will poll the status of preceding kernel steps, waiting for completion. For example, the first status command above will run a Status API call every minute checking for completion. If any of the steps return an error status, the pipeline is halted and the program exits.
@@ -77,6 +92,12 @@ Allows conditionally running a pipeline based on dataset update status. Retrieve
 kernel: /kaggle/kernel/path
 ```
 Returns the kernel specified at /kaggle/kernel/path
+
+#### output
+``` yaml
+output: /kaggle/kernel/path
+```
+Downloads kernel output files for the kernel specified at /kaggle/kernel/path
 
 #### status
 ```yaml
