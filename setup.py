@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
     DESCRIPTION = f.read()
 
 setup(name="kernelpipes",
-      version="1.0.0",
+      version="1.2.0",
       author="NeuML",
       description="Kaggle Kernel Pipelines",
       long_description=DESCRIPTION,
@@ -16,10 +16,10 @@ setup(name="kernelpipes",
           "Issue Tracker": "https://github.com/neuml/kernelpipes/issues",
           "Source Code": "https://github.com/neuml/kernelpipes",
       },
-      license="MIT License: http://opensource.org/licenses/MIT",
+      license="Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0",
       packages=find_packages(where="src/python"),
       package_dir={"": "src/python"},
-      keywords="python kaggle job task machine-learning",
+      keywords="kaggle job task machine-learning",
       python_requires=">=3.6",
       entry_points={
           "console_scripts": [
@@ -32,7 +32,7 @@ setup(name="kernelpipes",
           "PyYAML>=5.3"
       ],
       classifiers=[
-          "License :: OSI Approved :: MIT License",
+          "License :: OSI Approved :: Apache Software License",
           "Operating System :: OS Independent",
           "Programming Language :: Python :: 3",
           "Topic :: Software Development",
