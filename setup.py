@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
     DESCRIPTION = f.read()
 
 setup(name="kernelpipes",
-      version="1.2.0",
+      version="1.2.1",
       author="NeuML",
       description="Kaggle Kernel Pipelines",
       long_description=DESCRIPTION,

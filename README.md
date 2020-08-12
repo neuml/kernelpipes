@@ -1,8 +1,12 @@
 # Kaggle Kernel Pipelines
 kernelpipes is a Python 3.x project that supports running a series of Kaggle kernels through the Kaggle API. 
 
-### Installation
-kernelpipes can be directly installed from GitHub using pip. A Python Virtual Environment is recommended.
+## Installation
+The easiest way to install is via pip and PyPI
+
+    pip install kernelpipes
+
+You can also install kernelpipes directly from GitHub. Using a Python Virtual Environment is recommended.
 
     pip install git+https://github.com/neuml/kernelpipes
 
@@ -10,7 +14,7 @@ Python 3.6+ is supported
 
 This package assumes a Kaggle token has been generated and installed. See the [kaggle-api](https://github.com/Kaggle/kaggle-api) API credentials section for more information.
 
-### Example
+## Example
 The following YAML script is an example pipeline script. Pipelines require a name and a series of steps to execute. 
 
 ```yaml
@@ -62,44 +66,44 @@ kernelpipes pipeline.yml
 ```
 *Note: When running on Windows, it may be necessary to set an environment variable to force UTF-8 file operations before running the command above e.g. 'set PYTHONUTF8=1'*
 
-### Basic pipeline configuration
+## Basic pipeline configuration
 
-#### name
+### name
 ```yaml
 name: <pipeline name>
 ```
 
 Required field, names the pipeline
 
-#### schedule
+### schedule
 ```yaml
 schedule: cron string
 ```
 
 Optional field to enable running jobs through a scheduler. System cron can be used in place of this, depending on preference. One advantage of this method is that new jobs won't be spawned while a prior job is running. For example if a job is scheduled to run every hour and a run takes 1.5 hours, it will skip the 2nd run and start again on the 3rd hour. 
 
-### Steps
+## Steps
 
-#### check
+### check
 ```yaml
 check: /kaggle/dataset/path
 ```
 
 Allows conditionally running a pipeline based on dataset update status. Retrieves dataset metadata and compares the latest version against the last run version and only allows processing to proceed if the dataset has been updated. If there is no local metadata for the dataset, the run will proceed.
 
-#### kernel
+### kernel
 ``` yaml
 kernel: /kaggle/kernel/path
 ```
 Returns the kernel specified at /kaggle/kernel/path
 
-#### output
+### output
 ``` yaml
 output: /kaggle/kernel/path
 ```
 Downloads kernel output files for the kernel specified at /kaggle/kernel/path
 
-#### status
+### status
 ```yaml
 status: <seconds|s|m|h>
 ```
